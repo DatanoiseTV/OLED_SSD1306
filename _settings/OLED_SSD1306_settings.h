@@ -1,27 +1,27 @@
-#ifndef _OLED_SSD1306_SETTINGS_H
-#define _OLED_SSD1306_SETTINGS_H
+#ifndef _OLED_SSD1309_SETTINGS_H
+#define _OLED_SSD1309_SETTINGS_H
 
 
-#define SSD1306_128_64
-	//#define SSD1306_128_32
-	
-#define _SSD1306_BACKGROUND BLACK
-#define _SSD1306_FOREGROUND WHITE
-	
+#define SSD1309_128_64
+	//#define SSD1309_128_32
 
-#if defined SSD1306_128_64 && defined SSD1306_128_32
-  #error "Only one SSD1306 display can be specified at once in OLED_SSD1306_settings.h"
+#define _SSD1309_BACKGROUND BLACK
+#define _SSD1309_FOREGROUND WHITE
+
+
+#if defined SSD1309_128_64 && defined SSD1309_128_32
+  #error "Only one SSD1309 display can be specified at once in OLED_SSD1309_settings.h"
 #endif
-#if !defined SSD1306_128_64 && !defined SSD1306_128_32
-  #error "At least one SSD1306 display must be specified in OLED_SSD1306_settings.h"
+#if !defined SSD1309_128_64 && !defined SSD1309_128_32
+  #error "At least one SSD1309 display must be specified in OLED_SSD1309_settings.h"
 #endif
 
 
-#if defined SSD1306_128_64
+#if defined SSD1309_128_64
   #define OLED_WIDTH                  128
   #define OLED_HEIGHT                 64
 #endif
-#if defined SSD1306_128_32
+#if defined SSD1309_128_32
   #define OLED_WIDTH                  128
   #define OLED_HEIGHT                 32
 #endif

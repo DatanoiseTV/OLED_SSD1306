@@ -1,5 +1,5 @@
-#ifndef _OLED_SSD1306_REGISTERS_H
-#define _OLED_SSD1306_REGISTERS_H
+#ifndef _OLED_SSD1309_REGISTERS_H
+#define _OLED_SSD1309_REGISTERS_H
 
 const static byte _CMD_SETLOWCOLUMN = 							0x00;
 const static byte _CMD_EXTERNALVCC = 							0x01;

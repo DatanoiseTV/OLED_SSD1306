@@ -1,10 +1,10 @@
-#include "OLED_SSD1306.h"
-#include "OLED_SSD1306_buffer.h"
+#include "OLED_SSD1309.h"
+#include "OLED_SSD1309_buffer.h"
 
 
 extern "C" const unsigned char glcdfont[];
 //Begin function
-void OLED_SSD1306::begin(uint8_t switchvcc) 
+void OLED_SSD1309::begin(uint8_t switchvcc)
 {
 	_initError = 0b00000000;
 	setTextColor(WHITE);
@@ -21,7 +21,7 @@ void OLED_SSD1306::begin(uint8_t switchvcc)
 	if (_initError == 0) chipInit(_vccstate);
 }
 
-void OLED_SSD1306::invertDisplay(uint8_t i) 
+void OLED_SSD1309::invertDisplay(uint8_t i)
 {
 	if (i) {
 		writeCommand(_CMD_INVERTDISPLAY);
@@ -30,16 +30,16 @@ void OLED_SSD1306::invertDisplay(uint8_t i)
 	}
 }
 
-void OLED_SSD1306::startScroll(enum OLEDSSD1306SCRLLTYPE type,uint8_t start, uint8_t stop)
+void OLED_SSD1309::startScroll(enum OLEDSSD1309SCRLLTYPE type,uint8_t start, uint8_t stop)
 {
 	byte tt;
 	if (type == HR){
 		tt = _CMD_RIGHT_HORIZONTAL_SCROLL;
-	} else if (type == HL){	
+	} else if (type == HL){
 		tt = _CMD_LEFT_HORIZONTAL_SCROLL;
-	} else if (type == VR){	
+	} else if (type == VR){
 		tt = _CMD_SET_VERTICAL_SCROLL_AREA;
-	} else if (type == VL){	
+	} else if (type == VL){
 		tt = _CMD_SET_VERTICAL_SCROLL_AREA;
 	} else {
 		return;
@@ -70,12 +70,12 @@ void OLED_SSD1306::startScroll(enum OLEDSSD1306SCRLLTYPE type,uint8_t start, uin
 	endTransaction();
 }
 
-void OLED_SSD1306::stopScroll(void)
+void OLED_SSD1309::stopScroll(void)
 {
 	writeCommand(_CMD_DEACTIVATE_SCROLL);
 }
 
-void OLED_SSD1306::dim(boolean dim) 
+void OLED_SSD1309::dim(boolean dim)
 {
 	uint8_t contrast;
 	if (dim) {
@@ -90,14 +90,14 @@ void OLED_SSD1306::dim(boolean dim)
 	setRegister(_CMD_SETCONTRAST,contrast);
 }
 
-void OLED_SSD1306::clearDisplay(void) 
+void OLED_SSD1309::clearDisplay(void)
 {
 	memset(buffer, 0x00, OLED_BUFFERLEN);
 }
 
-void OLED_SSD1306::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) 
+void OLED_SSD1309::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
-	switch(_rotation) { 
+	switch(_rotation) {
 		case 0:// 0 degree rotation, do nothing
 			break;
 		case 1:// 90 degree rotation, swap x & y for rotation, then invert x
@@ -115,14 +115,14 @@ void OLED_SSD1306::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color
 			y -= (w - 1);
 			break;
 	}
-	if (_portrait) { 
+	if (_portrait) {
 		drawFastVLineInternal(x, y, w, color);
-	} else { 
+	} else {
 		drawFastHLineInternal(x, y, w, color);
 	}
 }
 
-void OLED_SSD1306::drawFastHLineInternal(int16_t x, int16_t y, int16_t w, uint16_t color) 
+void OLED_SSD1309::drawFastHLineInternal(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
 	if (y < 0 || y >= OLED_HEIGHT) return;// Do bounds/limit checks
 	if (x < 0) { w += x; x = 0; }// make sure we don't try to draw below 0
@@ -136,7 +136,7 @@ void OLED_SSD1306::drawFastHLineInternal(int16_t x, int16_t y, int16_t w, uint16
 	// and offset x columns in
 	pBuf += x;
 	register uint8_t mask = 1 << (y&7);
-	if (color == WHITE) { 
+	if (color == WHITE) {
 		while(w--) { *pBuf++ |= mask; }
 	} else {
 		mask = ~mask;
@@ -144,9 +144,9 @@ void OLED_SSD1306::drawFastHLineInternal(int16_t x, int16_t y, int16_t w, uint16
 	}
 }
 
-void OLED_SSD1306::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) 
+void OLED_SSD1309::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
-	switch(_rotation) { 
+	switch(_rotation) {
 		case 0:
 			break;
 		case 1:
@@ -164,21 +164,21 @@ void OLED_SSD1306::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color
 			y = OLED_MH - y;
 			break;
 	}
-	if (_portrait) { 
+	if (_portrait) {
 		drawFastHLineInternal(x, y, h, color);
 	} else {
 		drawFastVLineInternal(x, y, h, color);
 	}
 }
 
-void OLED_SSD1306::drawFastVLineInternal(int16_t x, int16_t y, int16_t h, uint16_t color) 
+void OLED_SSD1309::drawFastVLineInternal(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
 	if (x < 0 || x >= OLED_WIDTH) return;// do nothing if we're off the left or right side of the screen
 	// make sure we don't try to draw below 0
 	// y is negative, this will subtract enough from h to account for y being 0
-	if (y < 0) { h += y; y = 0; } 
+	if (y < 0) { h += y; y = 0; }
 	if ((y + h) > OLED_HEIGHT)  h = (OLED_HEIGHT - y);// make sure we don't go past the height of the display
-	if (h <= 0) return;// if our height is now negative, punt 
+	if (h <= 0) return;// if our height is now negative, punt
 	if (color > 0) color = WHITE;
 	// this display doesn't need ints for coordinates, use local byte registers for faster juggling
 	register uint8_t yn = y;
@@ -192,7 +192,7 @@ void OLED_SSD1306::drawFastVLineInternal(int16_t x, int16_t y, int16_t h, uint16
 	// do the first partial byte, if necessary - this requires some masking
 	register uint8_t mod = (yn&7);
 	if (mod) {
-		// mask off the high n bits we want to set 
+		// mask off the high n bits we want to set
 		mod = 8 - mod;
 		// note - lookup table results in a nearly 10% performance improvement in fill* functions
 		// register uint8_t mask = ~(0xFF >> (mod));
@@ -200,7 +200,7 @@ void OLED_SSD1306::drawFastVLineInternal(int16_t x, int16_t y, int16_t h, uint16
 		register uint8_t mask = premask[mod];
 		// adjust the mask if we're not going to reach the end of this byte
 		if (hn < mod) mask &= (0xFF >> (mod - hn));
-		if (color == WHITE) { 
+		if (color == WHITE) {
 			*pBuf |= mask;
 		} else {
 			*pBuf &= ~mask;
@@ -211,8 +211,8 @@ void OLED_SSD1306::drawFastVLineInternal(int16_t x, int16_t y, int16_t h, uint16
 		pBuf += OLED_WIDTH;
 	}
 	// write solid bytes while we can - effectively doing 8 rows at a time
-	if (hn >= 8) { 
-		// store a local value to work with 
+	if (hn >= 8) {
+		// store a local value to work with
 		register uint8_t val = (color == WHITE) ? 255 : 0;
 		do  {
 			// write our value in
@@ -222,7 +222,7 @@ void OLED_SSD1306::drawFastVLineInternal(int16_t x, int16_t y, int16_t h, uint16
 			// adjust h & y (there's got to be a faster way for me to do this, but this should still help a fair bit for now)
 			hn -= 8;
 		} while (hn >= 8);
-	}	
+	}
 	// now do the final partial byte, if necessary
 	if (hn) {
 		mod = hn & 7;
@@ -231,15 +231,15 @@ void OLED_SSD1306::drawFastVLineInternal(int16_t x, int16_t y, int16_t h, uint16
 		// note - lookup table results in a nearly 10% performance improvement in fill* functions
 		static const uint8_t postmask[8] = {0x00, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F };
 		register uint8_t mask = postmask[mod];
-		if (color == WHITE) { 
+		if (color == WHITE) {
 			*pBuf |= mask;
-		} else { 
+		} else {
 			*pBuf &= ~mask;
 		}
 	}
 }
-  
-void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
+
+void OLED_SSD1309::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
 	if ((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
 	if (color > 0) color = WHITE;
@@ -259,15 +259,15 @@ void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
 			break;
 	}
 	if (color == WHITE) {
-		buffer[x + (y / 8) * OLED_WIDTH] |= (1 << (y & 7));  
+		buffer[x + (y / 8) * OLED_WIDTH] |= (1 << (y & 7));
 	} else {
-		buffer[x + (y / 8) * OLED_WIDTH] &= ~(1 << (y & 7)); 
+		buffer[x + (y / 8) * OLED_WIDTH] &= ~(1 << (y & 7));
 	}
 }
 
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
-	OLED_SSD1306::OLED_SSD1306(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
+	OLED_SSD1309::OLED_SSD1309(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
 	{
 		_cs   = cspin;
 		_rs   = dcpin;
@@ -276,7 +276,7 @@ void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
 		_sclk = sclk;
 	}
 #elif defined(__MKL26Z64__)
-	OLED_SSD1306::OLED_SSD1306(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
+	OLED_SSD1309::OLED_SSD1309(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk)
 	{
 		_cs   = cspin;
 		_rs   = dcpin;
@@ -287,7 +287,7 @@ void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
 		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) _useSPI1 = true;
 	}
 #else
-	OLED_SSD1306::OLED_SSD1306(uint8_t cspin,uint8_t dcpin,uint8_t rstpin)
+	OLED_SSD1309::OLED_SSD1309(uint8_t cspin,uint8_t dcpin,uint8_t rstpin)
 	{
 		_cs   = cspin;
 		_rs   = dcpin;
@@ -296,13 +296,13 @@ void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
 #endif
 
 #if defined(SPI_HAS_TRANSACTION)
-	void OLED_SSD1306::setBitrate(uint32_t n)
+	void OLED_SSD1309::setBitrate(uint32_t n)
 	{
 	}
 #else
 	#ifdef __AVR__
 
-		void OLED_SSD1306::setBitrate(uint32_t n){
+		void OLED_SSD1309::setBitrate(uint32_t n){
 			if (n >= 8000000) {
 				SPI.setClockDivider(SPI_CLOCK_DIV2);
 			} else if (n >= 4000000) {
@@ -315,7 +315,7 @@ void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
 		}
 	#elif defined(__SAM3X8E__)
 
-		void OLED_SSD1306::setBitrate(uint32_t n){
+		void OLED_SSD1309::setBitrate(uint32_t n){
 			uint32_t divider=1;
 			while (divider < 255) {
 				if (n >= 84000000 / divider) break;
@@ -325,12 +325,12 @@ void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
 		}
 
 	#elif defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MKL26Z64__)
-		void OLED_SSD1306::setBitrate(uint32_t n)
+		void OLED_SSD1309::setBitrate(uint32_t n)
 		{
 
 		}
 	#else
-		void OLED_SSD1306::setBitrate(uint32_t n){
+		void OLED_SSD1309::setBitrate(uint32_t n){
 			if (n >= 8000000) {
 				SPI.setClockDivider(SPI_CLOCK_DIV2);
 			} else if (n >= 4000000) {
@@ -344,34 +344,34 @@ void OLED_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color)
 	#endif
 #endif
 
-void OLED_SSD1306::display(void) 
+void OLED_SSD1309::display(void)
 {
 	uint16_t i;
-	
+
 	startTransaction();
-	
+
 	setAdrsCont(0x00,OLED_MW,0x00,OLED_PGADRSVAL);
-	
+
 	for (i=0; i < OLED_BUFFERLEN; i++) {
 		if (i < OLED_BUFFERLEN-1){
 			writedata_cont(buffer[i]);
 		}
 	}
 	writecommand_last(_CMD_NOP);
-	
+
 	endTransaction();
 }
 
 
-uint8_t OLED_SSD1306::getError()
+uint8_t OLED_SSD1309::getError()
 {
 	return _initError;
 }
 
-void OLED_SSD1306::commonInit()
+void OLED_SSD1309::commonInit()
 {
-	
-#if defined(__AVR__) 
+
+#if defined(__AVR__)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	csport    = portOutputRegister(digitalPinToPort(_cs));
@@ -384,12 +384,12 @@ void OLED_SSD1306::commonInit()
 		SPI.setBitOrder(MSBFIRST);
 		SPI.setDataMode(SPI_MODE0);
 	#else
-		SSD1306_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
+		SSD1309_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
 	#endif
 	*rsport &= ~rspinmask;//LOW
 	_DC_state = LOW;
 	*csport |= cspinmask;//HI
-#elif defined(__SAM3X8E__) 
+#elif defined(__SAM3X8E__)
 	pinMode(_rs, OUTPUT);
 	pinMode(_cs, OUTPUT);
 	csport    = digitalPinToPort(_cs);
@@ -402,14 +402,14 @@ void OLED_SSD1306::commonInit()
 		SPI.setBitOrder(MSBFIRST);
 		SPI.setDataMode(SPI_MODE0);
 	#else
-		SSD1306_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
+		SSD1309_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
 	#endif
 	rsport->PIO_CODR |=  rspinmask;//LOW
 	csport->PIO_SODR  |=  cspinmask;//HI
 	_DC_state = LOW;
 #elif defined(__MK20DX128__) || defined(__MK20DX256__)
 	#if defined(SPI_HAS_TRANSACTION)
-		SSD1306_SPI = SPISettings(30000000, MSBFIRST, SPI_MODE0);
+		SSD1309_SPI = SPISettings(30000000, MSBFIRST, SPI_MODE0);
 	#endif
 	if ((_mosi == 11 || _mosi == 7) && (_sclk == 13 || _sclk == 14)) {
         SPI.setMOSI(_mosi);
@@ -434,7 +434,7 @@ void OLED_SSD1306::commonInit()
 
 	SPI.begin();
 	#if defined(SPI_HAS_TRANSACTION)
-		SSD1306_SPI = SPISettings(30000000, MSBFIRST, SPI_MODE0);
+		SSD1309_SPI = SPISettings(30000000, MSBFIRST, SPI_MODE0);
 	#endif
 	digitalWriteFast(_cs,HIGH);
 	digitalWriteFast(_rs,LOW);
@@ -449,7 +449,7 @@ void OLED_SSD1306::commonInit()
 		SPI.setBitOrder(MSBFIRST);
 		SPI.setDataMode(SPI_MODE0);
 	#else
-		SSD1306_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
+		SSD1309_SPI = SPISettings(8000000, MSBFIRST, SPI_MODE0);
 	#endif
 	digitalWrite(_cs,HIGH);
 	digitalWrite(_rs,LOW);
@@ -466,11 +466,11 @@ void OLED_SSD1306::commonInit()
 	}
 }
 
-void OLED_SSD1306::chipInit(uint8_t switchvcc) 
+void OLED_SSD1309::chipInit(uint8_t switchvcc)
 {
 	writeCommand(_CMD_DISPLAYOFF);
 	setRegister(_CMD_SETDISPLAYCLOCKDIV,0x80);
-	#if defined SSD1306_128_32
+	#if defined SSD1309_128_32
 		setRegister(_CMD_SETMULTIPLEX,0x1F);
 		setRegister(_CMD_SETDISPLAYOFFSET,0x00);
 		writeCommand(_CMD_SETSTARTLINE | 0x00);
@@ -490,7 +490,7 @@ void OLED_SSD1306::chipInit(uint8_t switchvcc)
 			setRegister(_CMD_SETPRECHARGE,0xF1);
 		}
 	#endif
-	#if defined SSD1306_128_64
+	#if defined SSD1309_128_64
 		setRegister(_CMD_SETMULTIPLEX,0x3F);
 		setRegister(_CMD_SETDISPLAYOFFSET,0x00);
 		writeCommand(_CMD_SETSTARTLINE | 0x00);
@@ -520,7 +520,7 @@ void OLED_SSD1306::chipInit(uint8_t switchvcc)
 	display();
 }
 
-void OLED_SSD1306::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1,uint16_t color) 
+void OLED_SSD1309::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1,uint16_t color)
 {
 	if (y0 == y1) {
 		if (x1 > x0) {
@@ -594,7 +594,7 @@ void OLED_SSD1306::drawLine(int16_t x0, int16_t y0,int16_t x1, int16_t y1,uint16
 	}
 }
 
-void OLED_SSD1306::drawRect(int16_t x,int16_t y,int16_t w,int16_t h,uint16_t color) 
+void OLED_SSD1309::drawRect(int16_t x,int16_t y,int16_t w,int16_t h,uint16_t color)
 {
 	drawFastHLine(x, y, w, color);
 	drawFastHLine(x, y+h-1, w, color);
@@ -602,7 +602,7 @@ void OLED_SSD1306::drawRect(int16_t x,int16_t y,int16_t w,int16_t h,uint16_t col
 	drawFastVLine(x+w-1, y, h, color);
 }
 
-void OLED_SSD1306::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color) 
+void OLED_SSD1309::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color)
 {
   // Update in subclasses if desired!
 	for (int16_t i=x; i<x+w; i++) {
@@ -610,7 +610,7 @@ void OLED_SSD1306::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t 
 	}
 }
 
-void OLED_SSD1306::fillScreen(uint16_t color) 
+void OLED_SSD1309::fillScreen(uint16_t color)
 {
 	/* fillRect(0, 0, _width, _height, color); */
 	uint8_t _color = 0x00;
@@ -619,7 +619,7 @@ void OLED_SSD1306::fillScreen(uint16_t color)
 	display();
 }
 
-void OLED_SSD1306::drawCircle(int16_t cx, int16_t cy, int16_t radius, uint16_t color)
+void OLED_SSD1309::drawCircle(int16_t cx, int16_t cy, int16_t radius, uint16_t color)
 {
 	int error = -radius;
 	int16_t x = radius;
@@ -637,13 +637,13 @@ void OLED_SSD1306::drawCircle(int16_t cx, int16_t cy, int16_t radius, uint16_t c
 	}
 }
 
-void OLED_SSD1306::plot8points(uint16_t cx, uint16_t cy, uint16_t x, uint16_t y, uint16_t color)
+void OLED_SSD1309::plot8points(uint16_t cx, uint16_t cy, uint16_t x, uint16_t y, uint16_t color)
 {
 	plot4points(cx, cy, x, y, color);
 	if (x != y) plot4points(cx, cy, y, x, color);
 }
 
-void OLED_SSD1306::plot4points(uint16_t cx, uint16_t cy, uint16_t x, uint16_t y, uint16_t color)
+void OLED_SSD1309::plot4points(uint16_t cx, uint16_t cy, uint16_t x, uint16_t y, uint16_t color)
 {
 	drawPixel(cx + x, cy + y, color);
 	if (x != 0) drawPixel(cx - x, cy + y, color);
@@ -651,7 +651,7 @@ void OLED_SSD1306::plot4points(uint16_t cx, uint16_t cy, uint16_t x, uint16_t y,
 	if (x != 0 && y != 0) drawPixel(cx - x, cy - y, color);
 }
 
-void OLED_SSD1306::drawCircleHelper(int16_t x0,int16_t y0,int16_t r,uint8_t cornername,uint16_t color) 
+void OLED_SSD1309::drawCircleHelper(int16_t x0,int16_t y0,int16_t r,uint8_t cornername,uint16_t color)
 {
 	int16_t f     = 1 - r;
 	int16_t ddF_x = 1;
@@ -668,14 +668,14 @@ void OLED_SSD1306::drawCircleHelper(int16_t x0,int16_t y0,int16_t r,uint8_t corn
 		x++;
 		ddF_x += 2;
 		f     += ddF_x;
-		if (cornername & 0x4) {drawPixel(x0 + x, y0 + y, color); drawPixel(x0 + y, y0 + x, color);} 
+		if (cornername & 0x4) {drawPixel(x0 + x, y0 + y, color); drawPixel(x0 + y, y0 + x, color);}
 		if (cornername & 0x2) {drawPixel(x0 + x, y0 - y, color);drawPixel(x0 + y, y0 - x, color);}
 		if (cornername & 0x8) {drawPixel(x0 - y, y0 + x, color);drawPixel(x0 - x, y0 + y, color);}
 		if (cornername & 0x1) {drawPixel(x0 - y, y0 - x, color);drawPixel(x0 - x, y0 - y, color);}
 	}
 }
 
-void OLED_SSD1306::fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color) 
+void OLED_SSD1309::fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color)
 {
 	int16_t f     = 1 - r;
 	int16_t ddF_x = 1;
@@ -704,7 +704,7 @@ void OLED_SSD1306::fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t c
 	}
 }
 
-void OLED_SSD1306::ellipse(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
+void OLED_SSD1309::ellipse(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
 {
 	int16_t a = abs(x1 - x0), b = abs(y1 - y0), b1 = b & 1; /* values of diameter */
 	long dx = 4 * (1 - a) * b * b, dy = 4 * (b1 + 1) * a * a; /* error increment */
@@ -733,13 +733,13 @@ void OLED_SSD1306::ellipse(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint1
 	}
 }
 
-void OLED_SSD1306::fillCircle(int16_t x0, int16_t y0, int16_t r,uint16_t color) 
+void OLED_SSD1309::fillCircle(int16_t x0, int16_t y0, int16_t r,uint16_t color)
 {
 	drawFastVLine(x0, y0-r, 2*r+1, color);
 	fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
-void OLED_SSD1306::drawTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color) 
+void OLED_SSD1309::drawTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color)
 {
 	drawLine(x0, y0, x1, y1, color);
 	drawLine(x1, y1, x2, y2, color);
@@ -747,7 +747,7 @@ void OLED_SSD1306::drawTriangle(int16_t x0, int16_t y0,int16_t x1, int16_t y1,in
 }
 
 
-void OLED_SSD1306::fillTriangle ( int16_t x0, int16_t y0,
+void OLED_SSD1309::fillTriangle ( int16_t x0, int16_t y0,
 				  int16_t x1, int16_t y1,
 				  int16_t x2, int16_t y2, uint16_t color) {
 
@@ -812,7 +812,7 @@ void OLED_SSD1306::fillTriangle ( int16_t x0, int16_t y0,
 
 
 
-void OLED_SSD1306::drawQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2,int16_t x3, int16_t y3, uint16_t color) 
+void OLED_SSD1309::drawQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2,int16_t x3, int16_t y3, uint16_t color)
 {
 	drawLine(x0, y0, x1, y1, color);//low 1
 	drawLine(x1, y1, x2, y2, color);//high 1
@@ -820,19 +820,19 @@ void OLED_SSD1306::drawQuad(int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_
 	drawLine(x3, y3, x0, y0, color);//low 2
 }
 
-void OLED_SSD1306::fillQuad ( int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color) 
+void OLED_SSD1309::fillQuad ( int16_t x0, int16_t y0,int16_t x1, int16_t y1,int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
 {
     fillTriangle(x0,y0,x1,y1,x2,y2,color);
     fillTriangle(x0,y0,x2,y2,x3,y3,color);
 }
 
-void OLED_SSD1306::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t diameter, float rot, uint16_t color)
-{ 
+void OLED_SSD1309::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t diameter, float rot, uint16_t color)
+{
 	sides = (sides > 2? sides : 3);
 	float dtr = (PI/180.0) + PI;
 	float rads = 360.0 / sides;//points spacd equally
 	uint8_t i;
-	for (i = 0; i < sides; i++) { 
+	for (i = 0; i < sides; i++) {
 		drawLine(
 			cx + (sin((i*rads + rot) * dtr) * diameter),
 			cy + (cos((i*rads + rot) * dtr) * diameter),
@@ -842,7 +842,7 @@ void OLED_SSD1306::drawPolygon(int16_t cx, int16_t cy, uint8_t sides, int16_t di
 	}
 }
 
-void OLED_SSD1306::drawRoundRect(int16_t x, int16_t y, int16_t w,int16_t h, int16_t r, uint16_t color) 
+void OLED_SSD1309::drawRoundRect(int16_t x, int16_t y, int16_t w,int16_t h, int16_t r, uint16_t color)
 {
   // smarter version
 	drawFastHLine(x+r  , y    , w-2*r, color); // Top
@@ -856,7 +856,7 @@ void OLED_SSD1306::drawRoundRect(int16_t x, int16_t y, int16_t w,int16_t h, int1
 	drawCircleHelper(x+r    , y+h-r-1, r, 8, color);
 }
 
-void OLED_SSD1306::fillRoundRect(int16_t x, int16_t y, int16_t w,int16_t h, int16_t r, uint16_t color) 
+void OLED_SSD1309::fillRoundRect(int16_t x, int16_t y, int16_t w,int16_t h, int16_t r, uint16_t color)
 {
 	// smarter version
 	fillRect(x+r, y, w-2*r, h, color);
@@ -865,7 +865,7 @@ void OLED_SSD1306::fillRoundRect(int16_t x, int16_t y, int16_t w,int16_t h, int1
 	fillCircleHelper(x+r    , y+r, r, 2, h-2*r-1, color);
 }
 
-void OLED_SSD1306::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color) 
+void OLED_SSD1309::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color)
 {
 	int16_t i, j, byteWidth = (w + 7) / 8;
 	for (j=0; j<h; j++) {
@@ -875,7 +875,7 @@ void OLED_SSD1306::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_
 	}
 }
 
-void OLED_SSD1306::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color, uint16_t bg) 
+void OLED_SSD1309::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_t w, int16_t h,uint16_t color, uint16_t bg)
 {
 	int16_t i, j, byteWidth = (w + 7) / 8;
 	for (j=0; j<h; j++) {
@@ -889,39 +889,39 @@ void OLED_SSD1306::drawBitmap(int16_t x, int16_t y,const uint8_t *bitmap, int16_
 	}
 }
 
-void OLED_SSD1306::setCursor(int16_t x, int16_t y) 
+void OLED_SSD1309::setCursor(int16_t x, int16_t y)
 {
 	_cursor_x = x;
 	_cursor_y = y;
 }
 
-void OLED_SSD1306::setTextColor(uint16_t c) 
+void OLED_SSD1309::setTextColor(uint16_t c)
 {
-	// For 'transparent' background, we'll set the bg 
+	// For 'transparent' background, we'll set the bg
 	// to the same as fg instead of using a flag
 	if (c != 0) c = WHITE;
 	_textcolor = _textbgcolor = c;
 }
 
-void OLED_SSD1306::setTextColor(uint16_t c, uint16_t b) 
+void OLED_SSD1309::setTextColor(uint16_t c, uint16_t b)
 {
 	if (c != 0) c = WHITE;
 	if (b != 0) b = WHITE;
 	_textcolor   = c;
-	_textbgcolor = b; 
+	_textbgcolor = b;
 }
 
-void OLED_SSD1306::setTextSize(uint8_t s) 
+void OLED_SSD1309::setTextSize(uint8_t s)
 {
 	_textsize = (s > 0) ? s : 1;
 }
 
-void OLED_SSD1306::setTextWrap(boolean w) 
+void OLED_SSD1309::setTextWrap(boolean w)
 {
 	_wrap = w;
 }
 
-void OLED_SSD1306::setRotation(uint8_t x) 
+void OLED_SSD1309::setRotation(uint8_t x)
 {
 	_rotation = (x & 3);
 	switch(_rotation) {
@@ -940,22 +940,22 @@ void OLED_SSD1306::setRotation(uint8_t x)
 	}
 }
 
-int16_t OLED_SSD1306::width(void)
+int16_t OLED_SSD1309::width(void)
 {
 	return _width;
 }
- 
-int16_t OLED_SSD1306::height(void)
+
+int16_t OLED_SSD1309::height(void)
 {
 	return _height;
 }
 
-void OLED_SSD1306::drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t spacing, uint16_t color)
+void OLED_SSD1309::drawMesh(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t spacing, uint16_t color)
 {
 	if (spacing < 2) spacing = 2;
 	if (((x + w) - 1) >= _width)  w = _width  - x;
 	if (((y + h) - 1) >= _height) h = _height - y;
-	
+
 	int16_t n, m;
 
 	if (w < x) {n = w; w = x; x = n;}
@@ -1001,7 +1001,7 @@ static uint32_t fetchbits_signed(const uint8_t *p, uint32_t index, uint32_t requ
 	return (int32_t)val;
 }
 
-size_t OLED_SSD1306::write(uint8_t c)
+size_t OLED_SSD1309::write(uint8_t c)
 {
 	if (_font) {
 		if (c == '\n') {
@@ -1028,7 +1028,7 @@ size_t OLED_SSD1306::write(uint8_t c)
 	return 1;
 }
 
-void OLED_SSD1306::drawFontChar(unsigned int c)
+void OLED_SSD1309::drawFontChar(unsigned int c)
 {
 	uint32_t bitoffset;
 	const uint8_t *data;
@@ -1115,7 +1115,7 @@ void OLED_SSD1306::drawFontChar(unsigned int c)
 	}
 }
 
-void OLED_SSD1306::drawFontBits(uint32_t bits, uint32_t numbits, uint32_t x, uint32_t y, uint32_t repeat)
+void OLED_SSD1309::drawFontBits(uint32_t bits, uint32_t numbits, uint32_t x, uint32_t y, uint32_t repeat)
 {
 	// TODO: replace this *slow* code with something fast...
 	if (bits == 0) return;
@@ -1132,7 +1132,7 @@ void OLED_SSD1306::drawFontBits(uint32_t bits, uint32_t numbits, uint32_t x, uin
 	} while (repeat);
 }
 
-void OLED_SSD1306::drawChar(int16_t x, int16_t y, unsigned char c,
+void OLED_SSD1309::drawChar(int16_t x, int16_t y, unsigned char c,
 			    uint16_t fgcolor, uint16_t bgcolor, uint8_t size)
 {
 	if ((x >= _width)            || // Clip right

@@ -1,6 +1,6 @@
 
 #include <SPI.h>
-#include <OLED_SSD1306.h>
+#include <OLED_SSD1309.h>
 #include "../commonFonts/fonts/font_Arial.c"
 
 //Uncomment this block to use hardware SPI
@@ -8,7 +8,7 @@
 #define OLED_CS     10
 #define OLED_RESET  6
 
-OLED_SSD1306 oled(OLED_CS, OLED_DC, OLED_RESET);
+OLED_SSD1309 oled(OLED_CS, OLED_DC, OLED_RESET);
 
 void setup()   {
   Serial.begin(38400);

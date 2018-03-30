@@ -1,11 +1,11 @@
 #include <SPI.h>
-#include <OLED_SSD1306.h>
+#include <OLED_SSD1309.h>
 
 //Uncomment this block to use hardware SPI
 #define OLED_DC     21
 #define OLED_CS     10
 #define OLED_RESET  6
-OLED_SSD1306 oled(OLED_CS, OLED_DC, OLED_RESET);
+OLED_SSD1309 oled(OLED_CS, OLED_DC, OLED_RESET);
 
 
 #define NUMFLAKES 10
@@ -89,7 +89,7 @@ void loop() {
     testText(500);
     bitMapTest(500);
     testdrawbitmap(logo16_glcd_bmp, LOGO16_GLCD_HEIGHT, LOGO16_GLCD_WIDTH);
-    
+
     if (rot >= 3){
       rot = 0;
     } else {
